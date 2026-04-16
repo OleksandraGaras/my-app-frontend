@@ -36,7 +36,7 @@ async function searchCountry() {
 
 async function addFavorite(country) {
 
-    await fetch("http://localhost:4000/favorites", {
+    await fetch("https://my-app-favorites-uffg.onrender.com/favorites", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -49,7 +49,7 @@ async function addFavorite(country) {
 
 async function loadFavorites() {
 
-    const response = await fetch("http://localhost:4000/favorites");
+    const response = await fetch("https://my-app-favorites-uffg.onrender.com/favorites");
     const data = await response.json();
     const list = document.getElementById("favorites");
     list.innerHTML = "";
@@ -66,7 +66,7 @@ async function loadFavorites() {
 
 async function deleteFavorite(id) {
 
-    await fetch(`http://localhost:4000/favorites/${id}`, {
+    await fetch(`https://my-app-favorites-uffg.onrender.com/favorites/${id}`, {
         method: "DELETE"
     });
 
@@ -77,7 +77,7 @@ async function deleteFavorite(id) {
 
 async function addWishlist(country) {
 
-    await fetch("http://localhost:1010/wishlist", {
+    await fetch("https://my-app-wishlist-o33c.onrender.com/wishlist", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -90,7 +90,7 @@ async function addWishlist(country) {
 
 async function loadWishlist() {
 
-    const response = await fetch("http://localhost:1010/wishlist");
+    const response = await fetch("https://my-app-wishlist-o33c.onrender.com/wishlist");
     const data = await response.json();
     const list = document.getElementById("wishlist");
     list.innerHTML = "";
@@ -107,7 +107,7 @@ async function loadWishlist() {
 
 async function deleteWishlist(id) {
 
-    await fetch(`http://localhost:1010/wishlist/${id}`, {
+    await fetch(`https://my-app-wishlist-o33c.onrender.com/wishlist/${id}`, {
         method: "DELETE"
     });
 
@@ -126,7 +126,7 @@ async function addComment(country) {
         return;
     }
 
-    await fetch("http://localhost:5000/comments", {
+    await fetch("https://my-app-comments-y4gm.onrender.com/comments", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -140,7 +140,7 @@ async function addComment(country) {
 
 async function loadComments() {
 
-    const response = await fetch("http://localhost:5000/comments");
+    const response = await fetch("https://my-app-comments-y4gm.onrender.com/comments");
     const data = await response.json();
     const list = document.getElementById("comments");
     list.innerHTML = "";
@@ -157,7 +157,7 @@ async function loadComments() {
 
 async function deleteComment(id) {
 
-    await fetch(`http://localhost:5000/comments/${id}`, {
+    await fetch(`https://my-app-comments-y4gm.onrender.com/comments/${id}`, {
         method: "DELETE"
     });
 
