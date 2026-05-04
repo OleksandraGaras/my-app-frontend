@@ -1,25 +1,54 @@
-name: CI
+name: CI  # Nom del workflow de integració contínua
 
+# Triggers: quan s'executa aquest workflow
 on:
   push:
-    branches: [main]
+    branches: [main]       # S'executa en cada push a la branca main
   pull_request:
-    branches: [main]
-
+    branches: [main]       # S'executa quan s'obre o actualitza un PR cap a main
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-and-verify:
+    name: Build i Verificació de Qualitat
+    runs-on: ubuntu-latest  # Execució sobre un runner Ubuntu
 
     steps:
-      - uses: actions/checkout@v4
+      # Pas 1: Obtenir el codi font del repositori al runner
+      - name: Checkout del codi
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      # Pas 2: Configurar l'entorn Node.js (versió 18) amb cache de npm per
+      # accelerar les instal·lacions en execucions futures
+      - name: Configuració de Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
-      - name: Install dependencies
+      # Pas 3: Instal·lar totes les dependències definides al package.json
+      # incloses les devDependencies (ex: eslint)
+      - name: Instal·lació de dependències
         run: npm install
 
-      - name: Run tests
+      # Pas 4: Verificar que el projecte es pot construir correctament.
+      # Per a una app Node.js/Express, comprova la sintaxi del fitxer principal
+      # sense arrencar el servidor (node --check).
+      # Si hi ha errors de sintaxi, el workflow s'atura aquí.
+      - name: Build del projecte
+        run: npm run build
+
+      # Pas 5: Analitzar el codi amb ESLint per detectar errors i problemes d'estil.
+      # Usa la configuració definida a .eslintrc.json.
+      # Si hi ha errors de linting, el workflow s'atura aquí.
+      - name: Anàlisi amb ESLint
+        run: npm run lint
+
+      # Pas 6: Executar els tests del projecte.
+      # Si els tests fallen, el workflow s'atura aquí i no es desplegarà.
+      - name: Execució de tests
         run: npm test
+
+      # Pas opcional: Missatge informatiu si algun pas anterior ha fallat.
+      # La condició "if: failure()" fa que s'executi NOMÉS en cas de fallida.
+      - name: Notificació de fallida
+        if: failure()
+        run: echo "El workflow ha fallat. Revisa els passos anteriors per identificar l'error."

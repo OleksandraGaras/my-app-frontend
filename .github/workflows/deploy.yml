@@ -1,0 +1,70 @@
+name: Deploy  # Workflow de desplegament automàtic a Render
+
+# S'activa NOMÉS quan es fusiona codi a main (PR aprovada i merged)
+# No s'activa en pull requests obertes, per evitar desplegaments prematurs
+on:
+  push:
+    branches: [main]
+jobs:
+  # Job 1: Validació completa abans del desplegament
+  validate:
+    name: Validació prèvia al desplegament
+    runs-on: ubuntu-latest
+
+    steps:
+      # Obtenir el codi del repositori
+      - name: Checkout del codi
+        uses: actions/checkout@v4
+
+      # Configurar Node.js amb cache
+      - name: Configuració de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # Instal·lar dependències (inclou eslint com a devDependency)
+      - name: Instal·lació de dependències
+        run: npm install
+
+      # Verificar que el projecte es construeix correctament
+      - name: Build del projecte
+        run: npm run build
+
+      # Analitzar el codi amb ESLint
+      - name: Anàlisi amb ESLint
+        run: npm run lint
+
+      # Executar els tests
+      - name: Execució de tests
+        run: npm test
+
+  # Job 2: Desplegament a Render
+  # IMPORTANT: Aquest job s'executa NOMÉS si el job "validate" ha passat amb èxit
+  deploy:
+    name: Desplegament a Render
+    needs: validate              # Depèn del job anterior — si falla, aquest no s'executa
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Doble seguretat: només desplega a main
+
+    steps:
+      # Obtenir el codi del repositori
+      - name: Checkout del codi
+        uses: actions/checkout@v4
+
+      # Desplegar a Render mitjançant el Deploy Hook.
+      # El Deploy Hook és una URL única que Render proporciona per activar desplegaments.
+      # Com configurar-lo:
+      #   1. Ves al teu servei a Render Dashboard
+      #   2. Settings > Deploy Hook > Copy Hook URL
+      #   3. A GitHub: Settings > Secrets and variables > Actions > New repository secret
+      #   4. Crea el secret amb nom: RENDER_DEPLOY_HOOK_URL
+      #      i valor: la URL copiada de Render
+      - name: Desplegar a Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          echo "Desplegament activat a Render!"
+
+      # Confirmar que el trigger s'ha enviat correctament
+      - name: Confirmació de desplegament
+        run: echo "El desplegament a Render s'ha activat correctament. Comprova el progrés al Render Dashboard."
